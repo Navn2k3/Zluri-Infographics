@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zluri App Catalog - Competitive Research & Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals & Slate Blue -->
+    <!-- Application Structure Plan: A dashboard-style single-page application with a fixed left sidebar for primary navigation and a dynamic main content area. This structure was chosen to allow users to easily switch between different facets of the analysis (introduction, competitor details, comparison, insights) without losing context or needing to scroll through a long, linear document. The "Competitor Deep Dive" uses a secondary tab-based navigation to let users focus on one competitor at a time, while the "Feature Comparison" synthesizes data into a single, easily digestible chart. This non-linear, task-oriented approach enhances usability and comprehension over a traditional report format. -->
+    <!-- Visualization & Content Choices: 
+        1. Report Info: Detailed competitor analysis -> Goal: Inform & Compare -> Viz/Presentation: Tabbed interface with structured text and lists -> Interaction: User clicks on a competitor logo/tab to dynamically load their specific analysis into the main view -> Justification: Prevents information overload from a long scrolling page and allows for focused comparison.
+        2. Report Info: Cross-competitor feature sets -> Goal: Synthesize & Compare -> Viz/Presentation: Radar Chart (via Chart.js Canvas) -> Interaction: Hovering over the chart reveals tooltips with specific ratings for each competitor on a given feature -> Justification: A radar chart provides an immediate visual "fingerprint" of each platform's strengths and weaknesses, making high-level comparison much faster than reading through text.
+        3. Report Info: Key takeaways for Zluri -> Goal: Summarize & Recommend -> Viz/Presentation: Card-based layout with icons -> Interaction: Simple hover states to indicate interactivity -> Justification: Cards break down the final recommendations into digestible, actionable points, and icons provide quick visual context.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 60vh;
+            max-height: 500px;
+        }
+        .nav-link.active {
+            background-color: #e0e7ff;
+            color: #3730a3;
+            font-weight: 600;
+        }
+        .competitor-tab.active {
+            border-color: #4f46e5;
+            background-color: #eef2ff;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+    <div class="flex h-screen">
+        <aside class="w-64 bg-white border-r border-slate-200 p-6 flex-shrink-0 flex flex-col justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900 mb-1">Zluri</h1>
+                <h2 class="text-sm font-medium text-slate-500 mb-8">App Catalog Analysis</h2>
+                <nav class="space-y-2">
+                    <a href="#" data-section="introduction" class="nav-link flex items-center space-x-3 px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors duration-200">
+                        <span>🏠</span>
+                        <span>Introduction</span>
+                    </a>
+                    <a href="#" data-section="deep-dive" class="nav-link flex items-center space-x-3 px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors duration-200">
+                        <span>🔍</span>
+                        <span>Competitor Deep Dive</span>
+                    </a>
+                    <a href="#" data-section="comparison" class="nav-link flex items-center space-x-3 px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors duration-200">
+                        <span>📊</span>
+                        <span>Feature Comparison</span>
+                    </a>
+                    <a href="#" data-section="insights" class="nav-link flex items-center space-x-3 px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors duration-200">
+                        <span>💡</span>
+                        <span>Key Insights for Zluri</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="text-xs text-slate-400">
+                Competitive Analysis Report <br> For Internal Use
+            </div>
+        </aside>
+
+        <main class="flex-1 p-8 lg:p-12 overflow-y-auto">
+            <div id="introduction" class="content-section">
+                <div class="max-w-4xl mx-auto">
+                    <h1 class="text-4xl font-bold text-slate-900 mb-4">Competitive Research & Analysis</h1>
+                    <h2 class="text-xl text-slate-600 mb-8">Informing the Zluri Employee App Catalog</h2>
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 space-y-4 text-slate-700 leading-relaxed">
+                        <p>The purpose of this research is to analyze existing app catalog solutions to understand best practices, identify key user experience patterns, and extract actionable insights. The findings will directly inform the design and development of Zluri's new Employee App Catalog feature.</p>
+                        <p>By examining leaders in both enterprise and consumer markets, we can identify proven strategies for application discovery, user engagement, and information architecture. This ensures Zluri's solution is intuitive, effective, and drives employee adoption, ultimately reducing Shadow IT and streamlining app provisioning.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="deep-dive" class="content-section">
+                 <h1 class="text-4xl font-bold text-slate-900 mb-2">Competitor Deep Dive</h1>
+                 <p class="text-lg text-slate-500 mb-8">Select a platform to view a detailed breakdown of its app catalog experience.</p>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                </div>
+                <div id="competitor-details-container" class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 min-h-[500px]">
+                </div>
+            </div>
+
+            <div id="comparison" class="content-section">
+                <h1 class="text-4xl font-bold text-slate-900 mb-2">Feature Comparison Matrix</h1>
+                <p class="text-lg text-slate-500 mb-8 max-w-3xl">This chart provides a visual summary of how the analyzed platforms compare across key feature dimensions. Each axis represents a core aspect of an app catalog, from discovery to user engagement. This allows for a quick understanding of each competitor's strategic focus and relative strengths.</p>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <div class="chart-container">
+                        <canvas id="featureComparisonChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="insights" class="content-section">
+                 <h1 class="text-4xl font-bold text-slate-900 mb-2">Key Insights for Zluri's App Catalog</h1>
+                 <p class="text-lg text-slate-500 mb-8">Synthesized from the competitive analysis, these actionable insights provide strategic recommendations for Zluri's design.</p>
+                <div class="grid md:grid-cols-2 gap-8">
+                </div>
+            </div>
+        </main>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const reportData = {
+            competitors: {
+                google: {
+                    name: "Google Workspace Marketplace",
+                    logo: "https://placehold.co/100x40/000000/FFFFFF?text=Google",
+                    content: `
+                        <h3 class="text-2xl font-bold text-slate-800 mb-6">Google Workspace Marketplace Analysis</h3>
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">Discovery Experience</h4>
+                                <p class="text-slate-600">Users find apps via a prominent search bar and well-defined categories (e.g., 'Works with Gmail', 'Business Tools'). Filtering includes options for price, ratings, and app status. Featured and recommended apps are displayed on the main page, often curated by Google's editorial team.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">Information Architecture</h4>
+                                <p class="text-slate-600">App detail pages are clean, showing descriptions, screenshots, permissions required, developer info, and a version history. The emphasis is on integration with specific Google products.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">User Interface (UI) Patterns</h4>
+                                <p class="text-slate-600">Follows Google's Material Design principles with a card-based grid layout. The interface is clean, intuitive, and familiar to users of Google's ecosystem. App cards show the icon, name, a brief description, and average rating.</p>
+                            </div>
+                             <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">User Engagement Features</h4>
+                                <p class="text-slate-600">User reviews and star ratings are central to building trust. Users can write detailed reviews, which are publicly visible and influence an app's ranking and visibility within the marketplace.</p>
+                            </div>
+                            <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
+                               <div class="bg-green-50 p-4 rounded-lg">
+                                  <h5 class="font-semibold text-green-800 mb-2">What Works Well</h5>
+                                   <ul class="list-disc list-inside text-green-700 space-y-1">
+                                      <li>Seamless integration and trust within the Google ecosystem.</li>
+                                      <li>Clear presentation of required permissions.</li>
+                                   </ul>
+                               </div>
+                               <div class="bg-amber-50 p-4 rounded-lg">
+                                  <h5 class="font-semibold text-amber-800 mb-2">What Could Be Improved</h5>
+                                   <ul class="list-disc list-inside text-amber-700 space-y-1">
+                                      <li>Discovery beyond direct search can be limited.</li>
+                                      <li>Filtering options are less granular than competitors.</li>
+                                   </ul>
+                               </div>
+                            </div>
+                        </div>`
+                },
+                salesforce: {
+                    name: "Salesforce AppExchange",
+                    logo: "https://placehold.co/100x40/000000/FFFFFF?text=Salesforce",
+                    content: `
+                        <h3 class="text-2xl font-bold text-slate-800 mb-6">Salesforce AppExchange Analysis</h3>
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">Discovery Experience</h4>
+                                <p class="text-slate-600">Extremely powerful discovery tools. Users can filter by industry, price, rating, Salesforce edition, and more. 'Collections' curate apps for specific business needs (e.g., 'Apps for Sales Teams'). The search is robust and multifaceted.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">Information Architecture</h4>
+                                <p class="text-slate-600">App pages are information-dense, featuring videos, detailed feature lists, pricing tiers, customer case studies, and extensive developer information. A key element is the 'Salesforce Security Review' badge, which builds significant trust.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">User Interface (UI) Patterns</h4>
+                                <p class="text-slate-600">The UI is professional and B2B-focused, prioritizing information density over visual flair. It uses a mix of card and list views. While highly functional, it can feel overwhelming for new users.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">User Engagement Features</h4>
+                                <p class="text-slate-600">Features robust user reviews, star ratings, and dedicated Q&A sections. The number of installs is prominently displayed as a key trust signal, encouraging adoption of popular, proven solutions.</p>
+                            </div>
+                            <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
+                               <div class="bg-green-50 p-4 rounded-lg">
+                                  <h5 class="font-semibold text-green-800 mb-2">What Works Well</h5>
+                                   <ul class="list-disc list-inside text-green-700 space-y-1">
+                                      <li>Powerful, granular filtering and search capabilities.</li>
+                                      <li>Detailed information and trust signals (e.g., security review).</li>
+                                   </ul>
+                               </div>
+                               <div class="bg-amber-50 p-4 rounded-lg">
+                                  <h5 class="font-semibold text-amber-800 mb-2">What Could Be Improved</h5>
+                                   <ul class="list-disc list-inside text-amber-700 space-y-1">
+                                      <li>The dense interface can be intimidating for casual browsing.</li>
+                                      <li>Aesthetic feels slightly dated compared to modern consumer apps.</li>
+                                   </ul>
+                               </div>
+                            </div>
+                        </div>`
+                },
+                okta: {
+                    name: "Okta End-User Dashboard",
+                    logo: "https://placehold.co/100x40/000000/FFFFFF?text=Okta",
+                    content: `
+                        <h3 class="text-2xl font-bold text-slate-800 mb-6">Okta End-User Dashboard Analysis</h3>
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">Discovery Experience</h4>
+                                <p class="text-slate-600">This is a launchpad, not a marketplace. Discovery is limited to apps pre-approved and assigned by IT. The primary interaction is searching for an already-known app or finding it in a simple list. There are no traditional discovery features.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">Information Architecture</h4>
+                                <p class="text-slate-600">Extremely minimal. Each app is represented by its name and logo (a 'chiclet'). There are no detail pages. The sole purpose is to provide a single sign-on (SSO) link to launch the application.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">User Interface (UI) Patterns</h4>
+                                <p class="text-slate-600">A simple, utilitarian grid of app icons. The interface is clean and highly functional for its purpose: launching apps. Users can often organize their own dashboard layout. The visual design is secondary to speed and function.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">User Engagement Features</h4>
+                                <p class="text-slate-600">None. The platform is a utility for access, not a hub for discovery or interaction. Trust is established by IT's curation, not by social proof like reviews or ratings.</p>
+                            </div>
+                             <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
+                               <div class="bg-green-50 p-4 rounded-lg">
+                                  <h5 class="font-semibold text-green-800 mb-2">What Works Well</h5>
+                                   <ul class="list-disc list-inside text-green-700 space-y-1">
+                                      <li>Extremely simple and fast for launching approved apps.</li>
+                                      <li>Uncluttered, functional user experience.</li>
+                                   </ul>
+                               </div>
+                               <div class="bg-amber-50 p-4 rounded-lg">
+                                  <h5 class="font-semibold text-amber-800 mb-2">What Could Be Improved</h5>
+                                   <ul class="list-disc list-inside text-amber-700 space-y-1">
+                                      <li>Zero support for discovering new or unassigned applications.</li>
+                                      <li>Completely reliant on IT for any updates to the app list.</li>
+                                   </ul>
+                               </div>
+                            </div>
+                        </div>`
+                },
+                apple: {
+                    name: "Apple App Store",
+                    logo: "https://placehold.co/100x40/000000/FFFFFF?text=Apple",
+                    content: `
+                        <h3 class="text-2xl font-bold text-slate-800 mb-6">Apple App Store Analysis</h3>
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">Discovery Experience</h4>
+                                <p class="text-slate-600">Best-in-class discovery driven by strong editorial curation (the 'Today' tab). Features human-written stories, app collections, and interviews. Standard discovery via charts (Top Free/Paid) and well-defined categories is also present. Search is powerful and predictive.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">Information Architecture</h4>
+                                <p class="text-slate-600">Highly visual. App pages prioritize large screenshots and auto-playing videos. Key info is presented clearly: succinct descriptions, 'What's New' updates, and privacy 'nutrition labels' that build user trust by detailing data collection practices.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">User Interface (UI) Patterns</h4>
+                                <p class="text-slate-600">A polished, visually-driven card layout with smooth animations and transitions. The UI feels premium and encourages exploration. It sets the standard for a modern, engaging browsing experience.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">User Engagement Features</h4>
+                                <p class="text-slate-600">User ratings and reviews are a cornerstone of the platform. 'Editor's Choice' awards act as a strong trust signal. The entire experience is designed to feel interactive and encourage users to explore and try new apps.</p>
+                            </div>
+                             <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
+                               <div class="bg-green-50 p-4 rounded-lg">
+                                  <h5 class="font-semibold text-green-800 mb-2">What Works Well</h5>
+                                   <ul class="list-disc list-inside text-green-700 space-y-1">
+                                      <li>Superb user experience and visual design.</li>
+                                      <li>Excellent content curation and storytelling for discovery.</li>
+                                   </ul>
+                               </div>
+                               <div class="bg-amber-50 p-4 rounded-lg">
+                                  <h5 class="font-semibold text-amber-800 mb-2">What Could Be Improved</h5>
+                                   <ul class="list-disc list-inside text-amber-700 space-y-1">
+                                      <li>Review quality can be inconsistent (not enterprise-focused).</li>
+                                      <li>Not directly translatable to an enterprise context without adaptation.</li>
+                                   </ul>
+                               </div>
+                            </div>
+                        </div>`
+                },
+                servicenow: {
+                    name: "ServiceNow Service Portal",
+                    logo: "https://placehold.co/100x40/000000/FFFFFF?text=ServiceNow",
+                    content: `
+                        <h3 class="text-2xl font-bold text-slate-800 mb-6">ServiceNow Service Portal Analysis</h3>
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">Discovery Experience</h4>
+                                <p class="text-slate-600">Primarily a request portal. Discovery is based on searching a 'catalog' of available IT services and applications. It is not designed for casual browsing but for finding a specific, known item to request access to. Categorization helps narrow searches.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">Information Architecture</h4>
+                                <p class="text-slate-600">Information is focused on the service request process. Details include functional descriptions, who is eligible to request it, expected delivery times (SLAs), and the specific approval workflow it will follow. It's more functional than marketing-oriented.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">User Interface (UI) Patterns</h4>
+                                <p class="text-slate-600">The interface is typically form-based and functional, designed to integrate into a broader corporate portal. The UX can feel dated and less intuitive compared to modern app stores, focusing on process completion over user delight.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-slate-700 mb-2">User Engagement Features</h4>
+                                <p class="text-slate-600">Engagement is limited to the request lifecycle: submitting the request, adding comments, and tracking its status. There are generally no public-facing review or rating systems for the catalog items.</p>
+                            </div>
+                             <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
+                               <div class="bg-green-50 p-4 rounded-lg">
+                                  <h5 class="font-semibold text-green-800 mb-2">What Works Well</h5>
+                                   <ul class="list-disc list-inside text-green-700 space-y-1">
+                                      <li>Excellent integration with IT Service Management (ITSM) workflows.</li>
+                                      <li>Provides transparency into the request and approval process.</li>
+                                   </ul>
+                               </div>
+                               <div class="bg-amber-50 p-4 rounded-lg">
+                                  <h5 class="font-semibold text-amber-800 mb-2">What Could Be Improved</h5>
+                                   <ul class="list-disc list-inside text-amber-700 space-y-1">
+                                      <li>Poor experience for spontaneous app discovery.</li>
+                                      <li>User interface often feels clunky and unintuitive.</li>
+                                   </ul>
+                               </div>
+                            </div>
+                        </div>`
+                },
+            },
+            insights: [
+                { 
+                    icon: '🌟', 
+                    title: 'Curated Discovery Beats a Simple List', 
+                    justification: 'Employees, like consumers, respond well to guidance. A simple grid of all available apps is overwhelming. Platforms like the Apple App Store (with its "Today" tab) and Salesforce AppExchange (with "Collections") show that curation is key. For Zluri, this means IT should be able to feature recommended apps, create "starter kits" for new hires or specific teams (e.g., "Marketing Team Essentials"), and highlight tools that are secure and cost-effective. This transforms the catalog from a passive list into a strategic tool.'
+                },
+                { 
+                    icon: '💬', 
+                    title: 'Social Proof is Critical for Internal Trust', 
+                    justification: 'An employee is more likely to trust a tool recommended by a colleague than one simply listed by IT. The success of user reviews on the Apple App Store and Salesforce AppExchange proves this. Zluri should implement a simple, internal-only rating and review system. This allows employees to share their experiences, helps identify popular and effective tools, and provides valuable, real-world feedback to the IT department, reducing their burden to justify every app.' 
+                },
+                { 
+                    icon: '📑', 
+                    title: 'Balance Simplicity with Access to Depth', 
+                    justification: 'The Okta dashboard is simple but provides no information, while Salesforce can be overwhelming. The ideal app detail page, inspired by Google and Apple, should show crucial information at a glance: what the app does, who uses it internally, and key screenshots. However, it must also provide access to deeper information for those who need it, such as security compliance details, full feature lists, or the internal point-of-contact. A tabbed or expandable UI would be perfect for this.'
+                },
+                { 
+                    icon: '🔗', 
+                    title: 'Seamless Request & Approval Workflows are Key', 
+                    justification: 'Finding an app is only half the battle. The experience breaks down if the request process is opaque. Learning from ServiceNow\'s strength in workflows, the "Get" or "Request" button in Zluri\'s catalog must initiate a clear, transparent process. The user should be able to see the status of their request (e.g., "Pending Manager Approval") directly within the app catalog, closing the loop and creating a far superior employee experience.'
+                }
+            ],
+            chartData: {
+                labels: ['Rich Discovery', 'Detailed Info', 'Modern UI/UX', 'Social Proof', 'Workflow Int.'],
+                datasets: [
+                    { label: 'Google', data: [3, 3, 4, 4, 3], borderColor: '#4285F4', backgroundColor: 'rgba(66, 133, 244, 0.2)' },
+                    { label: 'Salesforce', data: [5, 5, 2, 5, 4], borderColor: '#00A1E0', backgroundColor: 'rgba(0, 161, 224, 0.2)' },
+                    { label: 'Okta', data: [1, 1, 3, 1, 5], borderColor: '#007DC1', backgroundColor: 'rgba(0, 125, 193, 0.2)' },
+                    { label: 'Apple', data: [5, 4, 5, 5, 2], borderColor: '#A2AAAD', backgroundColor: 'rgba(162, 170, 173, 0.2)' },
+                    { label: 'ServiceNow', data: [2, 3, 2, 1, 5], borderColor: '#81B549', backgroundColor: 'rgba(129, 181, 73, 0.2)' }
+                ]
+            }
+        };
+
+        const navLinks = document.querySelectorAll('.nav-link');
+        const contentSections = document.querySelectorAll('.content-section');
+        const deepDiveContainer = document.querySelector('#deep-dive');
+        const competitorTabsContainer = deepDiveContainer.querySelector('.grid');
+        const competitorDetailsContainer = document.getElementById('competitor-details-container');
+
+        function switchSection(sectionId) {
+            contentSections.forEach(section => {
+                section.classList.toggle('active', section.id === sectionId);
+            });
+            navLinks.forEach(link => {
+                link.classList.toggle('active', link.dataset.section === sectionId);
+            });
+            if (sectionId === 'comparison') {
+                renderChart();
+            }
+        }
+        
+        function loadCompetitorContent(competitorId) {
+            const competitor = reportData.competitors[competitorId];
+            if (competitor) {
+                competitorDetailsContainer.innerHTML = competitor.content;
+            }
+
+            deepDiveContainer.querySelectorAll('.competitor-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.competitor === competitorId);
+            });
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchSection(link.dataset.section);
+            });
+        });
+
+        Object.keys(reportData.competitors).forEach(key => {
+            const competitor = reportData.competitors[key];
+            const tab = document.createElement('button');
+            tab.className = 'competitor-tab p-4 bg-white border-2 border-slate-200 rounded-lg shadow-sm hover:border-indigo-500 hover:shadow-md transition-all duration-200 flex justify-center items-center';
+            tab.dataset.competitor = key;
+            tab.innerHTML = `<img src="${competitor.logo}" alt="${competitor.name}" class="h-8 object-contain">`;
+            competitorTabsContainer.appendChild(tab);
+
+            tab.addEventListener('click', () => {
+                loadCompetitorContent(key);
+            });
+        });
+        
+        const insightsContainer = document.querySelector('#insights .grid');
+        reportData.insights.forEach(insight => {
+            const card = document.createElement('div');
+            card.className = 'bg-white p-6 rounded-xl shadow-sm border border-slate-200';
+            card.innerHTML = `
+                <div class="flex items-start space-x-4">
+                    <span class="text-3xl">${insight.icon}</span>
+                    <div>
+                        <h4 class="text-lg font-semibold text-slate-800 mb-2">${insight.title}</h4>
+                        <p class="text-slate-600">${insight.justification}</p>
+                    </div>
+                </div>
+            `;
+            insightsContainer.appendChild(card);
+        });
+
+        let comparisonChart = null;
+        function renderChart() {
+            const ctx = document.getElementById('featureComparisonChart').getContext('2d');
+            if (comparisonChart) {
+                comparisonChart.destroy();
+            }
+            comparisonChart = new Chart(ctx, {
+                type: 'radar',
+                data: reportData.chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Competitor Feature Strengths (Rated 1-5)',
+                            padding: {
+                                top: 10,
+                                bottom: 20
+                            },
+                            font: {
+                                size: 16
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 5,
+                            pointLabels: {
+                                font: {
+                                    size: 12
+                                }
+                            },
+                             ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        switchSection('introduction');
+        loadCompetitorContent('google');
+    });
+</script>
+</body>
+</html>
